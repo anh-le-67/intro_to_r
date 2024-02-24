@@ -9,22 +9,56 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## 1 Cleaning
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+In this section, we aim to check for missing and duplicate values and remove columns that are insignificant in our univariate, bivariate and multivariate analysis.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+We start off by loading libraries and importing the dataset we will be using for this analysis.
 
-```{r cars}
-summary(cars)
+```{r}
+library(dplyr)
+library(tidyr)
+Census_Income <- read.csv("adult.csv")
 ```
 
-## Including Plots
+```{r}
+# Replace '?' elements with NA
+Census_Income <- data.frame(lapply(Census_Income, function(x) ifelse(x == '?', NA, x)))
+
+# Drop columns native.country, capital.gain, and capital.loss
+Census_Income <- subset(Census_Income, select = -c(native.country, capital.gain, capital.loss))
+
+# Remove missing values from the column occupation
+Census_Income <- Census_Income[complete.cases(Census_Income$occupation), ]
+```
+
+## 2 Basic visualisation
+
+To decide on which variables we will focus on in our analysis, we will run some basic statistical tests to understand the variables better.
+
+```{r}
+
+```
+
+## 3 Univariate analysis
 
 You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## 4 Multivariate analysis
+You can also embed plots, for example:
+
+```{r}
+
+```
+
+## 5 Graphical representations
+
+You can also embed plots, for example:
+
+```{r}
+
+```
