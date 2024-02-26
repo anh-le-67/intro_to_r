@@ -25,19 +25,67 @@ Census_Income <- read.csv("adult.csv")
 # Replace '?' elements with NA
 Census_Income <- data.frame(lapply(Census_Income, function(x) ifelse(x == '?', NA, x)))
 
-# Drop columns native.country, capital.gain, and capital.loss
-Census_Income <- subset(Census_Income, select = -c(native.country, capital.gain, capital.loss))
+# Drop columns native.country, capital.gain, capital.loss, relationship, and education.num
+Census_Income <- subset(Census_Income, select = -c(native.country, capital.gain, capital.loss, relationship, education.num))
 
 # Remove missing values from the column occupation
 Census_Income <- Census_Income[complete.cases(Census_Income$occupation), ]
+
+# Modify the income column to make it 1 if income is above 50k and 0 otherwise
+Census_Income$income <- ifelse(Census_Income$income == '<=50K', 0, 1)
 ```
 
 ## 2 Basic visualisation
 
-To decide on which variables we will focus on in our analysis, we will run some basic statistical tests to understand the variables better.
+To decide on which variables we will focus on in our analysis, we will run some basic statistical tests on the numerical and categorical variables to understand them better.
 
 ```{r}
+# Percentage of respondents with income > 50K
+income_freq <- table(Census_Income$income)
+barplot(income_freq, 
+        main = "Income Distribution", 
+        xlab = "Income Category", 
+        ylab = "Frequency", 
+        ylim = c(0, max(income_freq) + 1))
+mean(Census_Income$income == 1)*100
+```
+```{r}
+# Numerical variables
+hist(Census_Income$age, main = "Age", xlab = "Age", ylab = "Frequency")
+hist(Census_Income$hours.per.week, main = "Hours Worked", xlab = "Hours worked", ylab = "Frequency")
 
+# Nominal variables
+Census_Income %>%
+  group_by(workclass) %>%
+  summarise(income_level = sum(income == "0"))
+
+Census_Income %>%
+  group_by(education) %>%
+  summarise(income_level = sum(income == "0"))
+
+Census_Income %>%
+  group_by(marital.status) %>%
+  summarise(income_level = sum(income == "0"))
+
+Census_Income %>%
+  group_by(occupation) %>%
+  summarise(income_level = sum(income == "0"))
+
+Census_Income %>%
+  group_by(race) %>%
+  summarise(income_level = sum(income == "0"))
+
+Census_Income %>%
+  group_by(sex) %>%
+  summarise(income_level = sum(income == "0"))
+```
+
+```{r}
+# Correlation matrix of all numeric variables against income
+library(corrplot)
+CI_numeric <- Census_Income[, c("age", "hours.per.week", "income")]
+corr_mat <- cor(CI_numeric)
+corrplot(corr_mat, method = "number")
 ```
 
 ## 3 Univariate analysis
