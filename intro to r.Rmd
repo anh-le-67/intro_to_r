@@ -87,24 +87,53 @@ CI_numeric <- Census_Income[, c("age", "hours.per.week", "income")]
 corr_mat <- cor(CI_numeric)
 corrplot(corr_mat, method = "number")
 ```
+```{r}
+# descriptive statistics of hours worked per week
+summary(Census_Income$hours.per.week)
+```
 
 ## 3 Univariate analysis
-
 You can also embed plots, for example:
 
 ```{r}
+# logistic regression of individual variables on income
+# H0: independent variable has no impact on whether income is above 50K
+# H1: independent variable has an impact on whether income is above 50K
 
+library(tidyverse)
+logit_age <- glm(income ~ age, 
+             data = Census_Income, 
+             family = "binomial")
+summary(logit_age)
+
+logit_sex <- glm(income ~ sex, 
+             data = Census_Income, 
+             family = "binomial")
+summary(logit_sex)
+
+logit_race <- glm(income ~ race, 
+             data = Census_Income, 
+             family = "binomial")
+summary(logit_race)
+
+logit_hours <- glm(income ~ hours.per.week, 
+             data = Census_Income, 
+             family = "binomial")
+summary(logit_hours)
 ```
 
 ## 4 Multivariate analysis
 You can also embed plots, for example:
 
 ```{r}
-
+# multinomial logistic regression
+logit <- glm(income ~ age + sex + race + hours.per.week, 
+             data = Census_Income, 
+             family = "binomial")
+summary(logit)
 ```
 
 ## 5 Graphical representations
-
 You can also embed plots, for example:
 
 ```{r}
