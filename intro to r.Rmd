@@ -47,37 +47,11 @@ barplot(income_freq,
         xlab = "Income Category", 
         ylab = "Frequency", 
         ylim = c(0, max(income_freq) + 1))
-mean(census_income$income == 1)*100
 ```
 ```{r}
 # Numerical variables
 hist(census_income$age, main = "Age", xlab = "Age", ylab = "Frequency")
 hist(census_income$hours.per.week, main = "Hours Worked", xlab = "Hours worked", ylab = "Frequency")
-
-# Nominal variables
-census_income %>%
-  group_by(workclass) %>%
-  summarise(income_level = sum(income == "0"))
-
-census_income %>%
-  group_by(education) %>%
-  summarise(income_level = sum(income == "0"))
-
-census_income %>%
-  group_by(marital.status) %>%
-  summarise(income_level = sum(income == "0"))
-
-census_income %>%
-  group_by(occupation) %>%
-  summarise(income_level = sum(income == "0"))
-
-census_income %>%
-  group_by(race) %>%
-  summarise(income_level = sum(income == "0"))
-
-census_income %>%
-  group_by(sex) %>%
-  summarise(income_level = sum(income == "0"))
 ```
 
 ```{r}
@@ -88,11 +62,26 @@ corr_mat <- cor(CI_numeric)
 corrplot(corr_mat, method = "number")
 ```
 ```{r}
-# descriptive statistics of hours worked per week
+# descriptive statistics
 summary(census_income$hours.per.week)
 summary(census_income$age)
 sd(census_income$hours.per.week)
 sd(census_income$age)
+
+census_income %>%
+  group_by(sex) %>%
+  summarise(mean = mean(hours.per.week), sd = sd(hours.per.week)) %>%
+  mutate(mean = round(mean, 3), sd = round(sd, 3))
+
+census_income %>%
+  group_by(income) %>%
+  summarise(mean = mean(hours.per.week), sd = sd(hours.per.week)) %>%
+  mutate(mean = round(mean, 3), sd = round(sd, 3))
+
+census_income %>%
+  group_by(income) %>%
+  summarise(mean = mean(age), sd = sd(age)) %>%
+  mutate(mean = round(mean, 3), sd = round(sd, 3))
 ```
 
 ## 3 Univariate analysis
