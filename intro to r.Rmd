@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, comment = "")
+knitr::opts_chunk$set(echo = TRUE, comment = "", warning = FALSE)
 ```
 
 ## 1 Cleaning
@@ -18,6 +18,11 @@ We start off by loading libraries and importing the dataset we will be using for
 ```{r}
 library(dplyr)
 library(tidyr)
+library(tidyverse)
+library(ggplot2)
+library(gridExtra)
+library(lmtest)
+library(sandwich)
 census_income <- read.csv("adult.csv")
 ```
 
@@ -50,8 +55,12 @@ barplot(income_freq,
 ```
 ```{r}
 # Numerical variables
-hist(census_income$age, main = "Age", xlab = "Age", ylab = "Frequency")
-hist(census_income$hours.per.week, main = "Hours Worked", xlab = "Hours worked", ylab = "Frequency")
+age_hist <- ggplot(census_income, aes(age)) +
+  geom_histogram(binwidth = 0.5)
+hours_hist <- ggplot(census_income, aes(hours.per.week)) +
+  geom_histogram(binwidth = 3)
+
+grid.arrange(age_hist, hours_hist)
 ```
 
 ```{r}
@@ -91,26 +100,16 @@ You can also embed plots, for example:
 # logistic regression of individual variables on income
 # H0: independent variable has no impact on whether income is above 50K
 # H1: independent variable has an impact on whether income is above 50K
-
-library(tidyverse)
-logit_age <- glm(income ~ age, 
-             data = census_income, 
-             family = "binomial")
+logit_age <- lm(income ~ age, census_income)
 summary(logit_age)
 
-logit_sex <- glm(income ~ sex, 
-             data = census_income, 
-             family = "binomial")
+logit_sex <- lm(income ~ sex, census_income)
 summary(logit_sex)
 
-logit_race <- glm(income ~ race, 
-             data = census_income, 
-             family = "binomial")
+logit_race <- lm(income ~ race, census_income)
 summary(logit_race)
 
-logit_hours <- glm(income ~ hours.per.week, 
-             data = census_income, 
-             family = "binomial")
+logit_hors <- lm(income ~ hours.per.week, census_income)
 summary(logit_hours)
 ```
 
@@ -118,16 +117,20 @@ summary(logit_hours)
 You can also embed plots, for example:
 
 ```{r}
-# multinomial logistic regression
-logit <- glm(income ~ age + sex + race + hours.per.week, 
-             data = census_income, 
-             family = "binomial")
+# linear probability model
+logit <- lm(income ~ age + sex + race + hours.per.week, 
+             data = census_income)
 summary(logit)
+```
+```{r}
+# results with robust standard errors
+logit_robust <- coeftest(logit, vcov = vcovHC(logit, type="HC1"))
+logit_robust
 ```
 
 ## 5 Graphical representations
 You can also embed plots, for example:
 
 ```{r}
-
+plot(logit)
 ```
