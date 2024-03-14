@@ -118,8 +118,7 @@ You can also embed plots, for example:
 
 ```{r}
 # linear probability model
-logit <- lm(income ~ age + sex + race + hours.per.week, 
-             data = census_income)
+logit <- lm(income ~ age + sex + race + hours.per.week, census_income)
 summary(logit)
 ```
 ```{r}
