@@ -138,6 +138,9 @@ plot(logit)
 ```{r}
 library(ggplot2)
 library(gridExtra)
+ggplot(census_income, aes(x = hours.per.week, y = income, color = race, shape = sex)) +
+  geom_point(position = "jitter", size = 1 )
 ggplot(census_income, aes(x = age, y = income, color = race, shape = sex)) +
-  geom_point(position = "jitter")
+  geom_point(position = "jitter", size = 1)
+
 ```
