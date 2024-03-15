@@ -117,30 +117,20 @@ summary(linear_hours)
 You can also embed plots, for example:
 
 ```{r}
-<<<<<<< HEAD
-# multinomial logistic regression
-logit <- lm(income ~ race + age + sex + hours.per.week + workclass + education, 
-             data = Census_Income)
-=======
 # linear probability model
-logit <- lm(income ~ age + sex + race + hours.per.week, census_income)
->>>>>>> a48ddb24c1cbdec73dfbdaa4df6baba44c986f2b
-summary(logit)
+lpm <- lm(income ~ age + sex + race + hours.per.week, census_income)
+summary(lpm)
 ```
+
 ```{r}
 # results with robust standard errors
-logit_robust <- coeftest(logit, vcov = vcovHC(logit, type="HC1"))
-logit_robust
+coeftest(logit, vcov = vcovHC(logit, type="HC1"))
 ```
 
 ## 5 Graphical representations
 You can also embed plots, for example:
 
 ```{r}
-<<<<<<< HEAD
-library(ggplot2)
-library(gridExtra)
-=======
-plot(logit)
->>>>>>> a48ddb24c1cbdec73dfbdaa4df6baba44c986f2b
+plot(lpm)
+
 ```
