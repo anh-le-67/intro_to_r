@@ -134,3 +134,10 @@ You can also embed plots, for example:
 plot(logit)
 
 ```
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+ggplot(census_income, aes(x = age, y = income, color = race, shape = sex)) +
+  geom_point(position = "jitter")
+```
