@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, comment = "")
+knitr::opts_chunk$set(echo = TRUE, comment = "", warning = FALSE)
 ```
 
 ## 1 Cleaning
@@ -18,21 +18,26 @@ We start off by loading libraries and importing the dataset we will be using for
 ```{r}
 library(dplyr)
 library(tidyr)
-Census_Income <- read.csv("adult.csv")
+library(tidyverse)
+library(ggplot2)
+library(gridExtra)
+library(lmtest)
+library(sandwich)
+census_income <- read.csv("adult.csv")
 ```
 
 ```{r}
 # Replace '?' elements with NA
-Census_Income <- data.frame(lapply(Census_Income, function(x) ifelse(x == '?', NA, x)))
+census_income <- data.frame(lapply(census_income, function(x) ifelse(x == '?', NA, x)))
 
 # Drop columns native.country, capital.gain, capital.loss, relationship, and education.num
-Census_Income <- subset(Census_Income, select = -c(native.country, capital.gain, capital.loss, relationship, education.num))
+census_income <- subset(census_income, select = -c(native.country, capital.gain, capital.loss, relationship, education.num))
 
 # Remove missing values from the column occupation
-Census_Income <- Census_Income[complete.cases(Census_Income$occupation), ]
+census_income <- census_income[complete.cases(census_income$occupation), ]
 
 # Modify the income column to make it 1 if income is above 50k and 0 otherwise
-Census_Income$income <- ifelse(Census_Income$income == '<=50K', 0, 1)
+census_income$income <- ifelse(census_income$income == '<=50K', 0, 1)
 ```
 
 ## 2 Basic visualisation
@@ -41,55 +46,51 @@ To decide on which variables we will focus on in our analysis, we will run some 
 
 ```{r}
 # Percentage of respondents with income > 50K
-income_freq <- table(Census_Income$income)
+income_freq <- table(census_income$income)
 barplot(income_freq, 
         main = "Income Distribution", 
         xlab = "Income Category", 
         ylab = "Frequency", 
         ylim = c(0, max(income_freq) + 1))
-mean(Census_Income$income == 1)*100
 ```
 ```{r}
 # Numerical variables
-hist(Census_Income$age, main = "Age", xlab = "Age", ylab = "Frequency")
-hist(Census_Income$hours.per.week, main = "Hours Worked", xlab = "Hours worked", ylab = "Frequency")
+age_hist <- ggplot(census_income, aes(age)) +
+  geom_histogram(binwidth = 0.5)
+hours_hist <- ggplot(census_income, aes(hours.per.week)) +
+  geom_histogram(binwidth = 3)
 
-# Nominal variables
-Census_Income %>%
-  group_by(workclass) %>%
-  summarise(income_level = sum(income == "0"))
-
-Census_Income %>%
-  group_by(education) %>%
-  summarise(income_level = sum(income == "0"))
-
-Census_Income %>%
-  group_by(marital.status) %>%
-  summarise(income_level = sum(income == "0"))
-
-Census_Income %>%
-  group_by(occupation) %>%
-  summarise(income_level = sum(income == "0"))
-
-Census_Income %>%
-  group_by(race) %>%
-  summarise(income_level = sum(income == "0"))
-
-Census_Income %>%
-  group_by(sex) %>%
-  summarise(income_level = sum(income == "0"))
+grid.arrange(age_hist, hours_hist)
 ```
 
 ```{r}
 # Correlation matrix of all numeric variables against income
 library(corrplot)
-CI_numeric <- Census_Income[, c("age", "hours.per.week", "income")]
+CI_numeric <- census_income[, c("age", "hours.per.week", "income")]
 corr_mat <- cor(CI_numeric)
 corrplot(corr_mat, method = "number")
 ```
 ```{r}
-# descriptive statistics of hours worked per week
-summary(Census_Income$hours.per.week)
+# descriptive statistics
+summary(census_income$hours.per.week)
+summary(census_income$age)
+sd(census_income$hours.per.week)
+sd(census_income$age)
+
+census_income %>%
+  group_by(sex) %>%
+  summarise(mean = mean(hours.per.week), sd = sd(hours.per.week)) %>%
+  mutate(mean = round(mean, 3), sd = round(sd, 3))
+
+census_income %>%
+  group_by(income) %>%
+  summarise(mean = mean(hours.per.week), sd = sd(hours.per.week)) %>%
+  mutate(mean = round(mean, 3), sd = round(sd, 3))
+
+census_income %>%
+  group_by(income) %>%
+  summarise(mean = mean(age), sd = sd(age)) %>%
+  mutate(mean = round(mean, 3), sd = round(sd, 3))
 ```
 
 ## 3 Univariate analysis
@@ -99,26 +100,16 @@ You can also embed plots, for example:
 # logistic regression of individual variables on income
 # H0: independent variable has no impact on whether income is above 50K
 # H1: independent variable has an impact on whether income is above 50K
-
-library(tidyverse)
-logit_age <- glm(income ~ age, 
-             data = Census_Income, 
-             family = "binomial")
+logit_age <- lm(income ~ age, census_income)
 summary(logit_age)
 
-logit_sex <- glm(income ~ sex, 
-             data = Census_Income, 
-             family = "binomial")
+logit_sex <- lm(income ~ sex, census_income)
 summary(logit_sex)
 
-logit_race <- glm(income ~ race, 
-             data = Census_Income, 
-             family = "binomial")
+logit_race <- lm(income ~ race, census_income)
 summary(logit_race)
 
-logit_hours <- glm(income ~ hours.per.week, 
-             data = Census_Income, 
-             family = "binomial")
+logit_hors <- lm(income ~ hours.per.week, census_income)
 summary(logit_hours)
 ```
 
@@ -126,16 +117,30 @@ summary(logit_hours)
 You can also embed plots, for example:
 
 ```{r}
+<<<<<<< HEAD
 # multinomial logistic regression
 logit <- lm(income ~ race + age + sex + hours.per.week + workclass + education, 
              data = Census_Income)
+=======
+# linear probability model
+logit <- lm(income ~ age + sex + race + hours.per.week, census_income)
+>>>>>>> a48ddb24c1cbdec73dfbdaa4df6baba44c986f2b
 summary(logit)
+```
+```{r}
+# results with robust standard errors
+logit_robust <- coeftest(logit, vcov = vcovHC(logit, type="HC1"))
+logit_robust
 ```
 
 ## 5 Graphical representations
 You can also embed plots, for example:
 
 ```{r}
+<<<<<<< HEAD
 library(ggplot2)
 library(gridExtra)
+=======
+plot(logit)
+>>>>>>> a48ddb24c1cbdec73dfbdaa4df6baba44c986f2b
 ```
