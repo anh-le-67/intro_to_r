@@ -97,20 +97,20 @@ census_income %>%
 You can also embed plots, for example:
 
 ```{r}
-# logistic regression of individual variables on income
+# regression of individual variables on income
 # H0: independent variable has no impact on whether income is above 50K
 # H1: independent variable has an impact on whether income is above 50K
-logit_age <- lm(income ~ age, census_income)
-summary(logit_age)
+linear_age <- lm(income ~ age, census_income)
+summary(linear_age)
 
-logit_sex <- lm(income ~ sex, census_income)
-summary(logit_sex)
+linear_sex <- lm(income ~ sex, census_income)
+summary(linear_sex)
 
-logit_race <- lm(income ~ race, census_income)
-summary(logit_race)
+linear_race <- lm(income ~ race, census_income)
+summary(linear_race)
 
-logit_hors <- lm(income ~ hours.per.week, census_income)
-summary(logit_hours)
+linear_hours <- lm(income ~ hours.per.week, census_income)
+summary(linear_hours)
 ```
 
 ## 4 Multivariate analysis
@@ -118,21 +118,22 @@ You can also embed plots, for example:
 
 ```{r}
 # linear probability model
-logit <- lm(income ~ age + sex + race + hours.per.week, census_income)
-summary(logit)
+
+lpm <- lm(income ~ age + sex + race + hours.per.week, census_income)
+summary(lpm)
+
 ```
+
 ```{r}
 # results with robust standard errors
-logit_robust <- coeftest(logit, vcov = vcovHC(logit, type="HC1"))
-logit_robust
+coeftest(logit, vcov = vcovHC(logit, type="HC1"))
 ```
 
 ## 5 Graphical representations
 You can also embed plots, for example:
 
 ```{r}
-plot(logit)
-
+plot(lpm)
 ```
 
 ```{r}
