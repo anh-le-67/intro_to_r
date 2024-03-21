@@ -91,6 +91,13 @@ census_income %>%
   group_by(income) %>%
   summarise(mean = mean(age), sd = sd(age)) %>%
   mutate(mean = round(mean, 3), sd = round(sd, 3))
+
+count(census_income, sex)
+count(census_income, race)
+ggplot(census_income, aes(x = sex)) +
+  geom_bar() 
+ggplot(census_income, aes(x = race)) +
+  geom_bar()
 ```
 
 ## 3 Univariate analysis
@@ -129,6 +136,8 @@ summary(lpm)
 coeftest(logit, vcov = vcovHC(logit, type="HC1"))
 ```
 
+
+
 ## 5 Graphical representations
 You can also embed plots, for example:
 
@@ -140,8 +149,10 @@ plot(lpm)
 library(ggplot2)
 library(gridExtra)
 ggplot(census_income, aes(x = hours.per.week, y = income, color = race, shape = sex)) +
-  geom_point(position = "jitter", size = 0.5 )
+  geom_point(position = "jitter", size = 1 ) +
+  scale_color_manual(values = c("Blue", "Red", "Purple", "Green", "Beige"))
 ggplot(census_income, aes(x = age, y = income, color = race, shape = sex)) +
-  geom_point(position = "jitter", size = 0.75)
+  geom_point(position = "jitter", size = 1) + 
+  scale_color_manual(values = c("Blue", "Red", "Purple", "Green", "Beige"))
 
 ```
