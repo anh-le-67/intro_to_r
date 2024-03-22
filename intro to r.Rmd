@@ -71,30 +71,35 @@ corr_mat <- cor(CI_numeric)
 corrplot(corr_mat, method = "number")
 ```
 ```{r}
+# mean and sd of hours worked per week within the levels of sex
+census_income %>%
+  group_by(sex) %>%
+  summarise(mean_hours_worked = mean(hours.per.week), sd_hours_worked = sd(hours.per.week)) %>%
+  mutate(mean = round(mean, 3), sd = round(sd, 3))
+
+
+# mean and sd of hours worked per week and age within the levels of income
+census_income %>%
+  group_by(income) %>%
+  summarise(mean_hours_worked = mean(hours.per.week), sd_hours_worked = sd(hours.per.week)) %>%
+  mutate(mean = round(mean, 3), sd = round(sd, 3))
+
+census_income %>%
+  group_by(income) %>%
+  summarise(mean_age = mean(age), sd_age = sd(age)) %>%
+  mutate(mean = round(mean, 3), sd = round(sd, 3))
+```
+
+```{r}
 # descriptive statistics
 summary(census_income$hours.per.week)
 summary(census_income$age)
 sd(census_income$hours.per.week)
 sd(census_income$age)
-
-census_income %>%
-  group_by(sex) %>%
-  summarise(mean = mean(hours.per.week), sd = sd(hours.per.week)) %>%
-  mutate(mean = round(mean, 3), sd = round(sd, 3))
-
-census_income %>%
-  group_by(income) %>%
-  summarise(mean = mean(hours.per.week), sd = sd(hours.per.week)) %>%
-  mutate(mean = round(mean, 3), sd = round(sd, 3))
-
-census_income %>%
-  group_by(income) %>%
-  summarise(mean = mean(age), sd = sd(age)) %>%
-  mutate(mean = round(mean, 3), sd = round(sd, 3))
 ```
 
+
 ## 3 Univariate analysis
-You can also embed plots, for example:
 
 ```{r}
 # regression of individual variables on income
@@ -102,26 +107,29 @@ You can also embed plots, for example:
 # H1: independent variable has an impact on whether income is above 50K
 linear_age <- lm(income ~ age, census_income)
 summary(linear_age)
+```
 
+```{r}
 linear_sex <- lm(income ~ sex, census_income)
 summary(linear_sex)
+```
 
+```{r}
 linear_race <- lm(income ~ race, census_income)
 summary(linear_race)
+```
 
+```{r}
 linear_hours <- lm(income ~ hours.per.week, census_income)
 summary(linear_hours)
 ```
 
 ## 4 Multivariate analysis
-You can also embed plots, for example:
 
 ```{r}
 # linear probability model
-
 lpm <- lm(income ~ age + sex + race + hours.per.week, census_income)
 summary(lpm)
-
 ```
 
 ```{r}
@@ -130,18 +138,14 @@ coeftest(logit, vcov = vcovHC(logit, type="HC1"))
 ```
 
 ## 5 Graphical representations
-You can also embed plots, for example:
 
 ```{r}
 plot(lpm)
 ```
 
 ```{r}
-library(ggplot2)
-library(gridExtra)
 ggplot(census_income, aes(x = hours.per.week, y = income, color = race, shape = sex)) +
   geom_point(position = "jitter", size = 1 )
 ggplot(census_income, aes(x = age, y = income, color = race, shape = sex)) +
   geom_point(position = "jitter", size = 1)
-
 ```
