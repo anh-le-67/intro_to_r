@@ -75,19 +75,19 @@ corrplot(corr_mat, method = "number")
 census_income %>%
   group_by(sex) %>%
   summarise(mean_hours_worked = mean(hours.per.week), sd_hours_worked = sd(hours.per.week)) %>%
-  mutate(mean = round(mean, 3), sd = round(sd, 3))
+  mutate(mean = round(mean_hours_worked, 3), sd = round(sd_hours_worked, 3))
 
 
 # mean and sd of hours worked per week and age within the levels of income
 census_income %>%
   group_by(income) %>%
   summarise(mean_hours_worked = mean(hours.per.week), sd_hours_worked = sd(hours.per.week)) %>%
-  mutate(mean = round(mean, 3), sd = round(sd, 3))
+  mutate(mean = round(mean_hours_worked, 3), sd = round(sd_hours_worked, 3))
 
 census_income %>%
   group_by(income) %>%
   summarise(mean_age = mean(age), sd_age = sd(age)) %>%
-  mutate(mean = round(mean, 3), sd = round(sd, 3))
+  mutate(mean = round(mean_age, 3), sd = round(sd_age, 3))
 ```
 
 ```{r}
