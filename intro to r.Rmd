@@ -38,6 +38,8 @@ census_income <- census_income[complete.cases(census_income$occupation), ]
 
 # Modify the income column to make it 1 if income is above 50k and 0 otherwise
 census_income$income <- ifelse(census_income$income == '<=50K', '<=50K', '>50K')
+
+census_income$income <- ifelse(census_income$income == '<=50K', '0', 1)
 ```
 
 ## 2 Basic visualisation
@@ -161,11 +163,22 @@ summary(linear_hours)
 lpm <- lm(income ~ age + sex * race, census_income)
 summary(lpm)
 
+# comparison between 'with interaction' and 'without interaction'
+lm0 <- lm(income ~ age + sex + race, census_income)
+summary(lm0)
+anova(lm0, lpm)
 ```
 
 ## 5 Graphical representations
 
 ```{r}
+#regression of all variables
+lm(income ~ age + sex + race + workclass + fnlwgt + education + marital.status + occupation + hours.per.week, census_income) %>%
+  summary()
+```
+
+```{r}
+#residual plots
 par(mfrow = c(2, 2))
 plot(lpm)
 ```
