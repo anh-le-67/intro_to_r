@@ -37,7 +37,7 @@ census_income <- subset(census_income, select = -c(native.country, capital.gain,
 census_income <- census_income[complete.cases(census_income$occupation), ]
 
 # Modify the income column to make it 1 if income is above 50k and 0 otherwise
-census_income$income <- ifelse(census_income$income == '<=50K', 0, 1)
+census_income$income <- ifelse(census_income$income == '<=50K', '<=50K', '>50K')
 ```
 
 ## 2 Basic visualisation
@@ -158,17 +158,10 @@ summary(linear_hours)
 ```{r}
 # linear probability model
 
-lpm <- lm(income ~ age + sex + race + hours.per.week, census_income)
+lpm <- lm(income ~ age + sex * race, census_income)
 summary(lpm)
 
 ```
-
-```{r}
-# results with robust standard errors
-coeftest(logit, vcov = vcovHC(logit, type="HC1"))
-```
-
-
 
 ## 5 Graphical representations
 
@@ -178,11 +171,9 @@ plot(lpm)
 ```
 
 ```{r}
-ggplot(census_income, aes(x = hours.per.week, y = income, color = race, shape = sex)) +
-  geom_point(position = "jitter", size = 1 ) +
-  scale_color_manual(values = c("Blue", "Red", "Purple", "Green", "Orange"))
-ggplot(census_income, aes(x = age, y = income, color = race, shape = sex)) +
-  geom_point(position = "jitter", size = 1) + 
-  scale_color_manual(values = c("Blue", "Red", "Purple", "Green", "Orange"))
+ggplot(census_income, aes(x = age, y = income, color = race)) +
+  geom_point(position = "jitter", size = 0.75) + 
+  scale_color_manual(values = c("Blue", "Red", "Purple", "Green", "Orange")) +
+  facet_grid(cols = vars(sex))
 
 ```
