@@ -9,11 +9,15 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE, comment = "", warning = FALSE)
 ```
 
+According to the Bureau of Labour Statistics, the median annual income in the USA was US$35,492 in 1996. Under the race category, Asian-Pacific Islanders had the highest median of US$43,276, followed by Whites with US$37,161 and Blacks with US$23,482. The wage gap also persisted between genders, with males earning US$8,434 more in median income than females (cite). In 1996, the top 40% and top 20% of households received an aggregate income of US$44,006 and US$68,015 respectively. Thus, the benchmark value of US$50,000 in our dataset can also be an indicator of whether an individual is in the top 30% of households or not. Through this report, we can derive insights into the socioeconomic disparities that existed during that time and accurately identify demographic groups that are disproportionately affected by low income. This allows policymakers and institutions to work towards reducing income inequality and to facilitate their understanding of income determinants. 
+
+We will first begin by cleaning the data to ensure only relevant variables are kept and that all data is tidy. Based on the variables in our dataset, we will then run a multiple regression analysis on a mix of numerical and categorical variables to determine whether an individual’s annual income is above or below US$50,000. We expect our findings to conform with the report published by the US government and will also be utilising data visualisation techniques to demonstrate our results.
+
 ## 1 Cleaning
 
-In this section, we aim to check for missing and duplicate values and remove columns that are insignificant in our univariate, bivariate and multivariate analysis.
+The adult census income data was sourced from Kaggle, a platform with a repository of community-published models, data, and code (Kaggle, n.d.). Specifically, it was jointly published by UCI Machine Learning and the Kaggle Team.
 
-We start off by loading libraries and importing the dataset we will be using for this analysis.
+The data cleaning process involved several steps. First, we replaced the ‘?’ elements with NA using lapply() to properly deal with those missing values. We then used complete.cases() to remove the missing values to ensure that they do not skew our regression results. We also modified the income variable to a dummy variable, where it displayed 1 if income is above US$50,000 and 0 otherwise. This step allowed us to include a categorical variable in our future regression analysis.  
 
 ```{r, message=FALSE}
 library(dplyr)
@@ -21,8 +25,7 @@ library(tidyr)
 library(tidyverse)
 library(ggplot2)
 library(gridExtra)
-library(lmtest)
-library(sandwich)
+library(corrplot)
 census_income <- read.csv("adult.csv")
 ```
 
@@ -37,12 +40,12 @@ census_income <- subset(census_income, select = -c(native.country, capital.gain,
 census_income <- census_income[complete.cases(census_income$occupation), ]
 
 # Modify the income column to make it 1 if income is above 50k and 0 otherwise
-census_income$income <- ifelse(census_income$income == '<=50K', '<=50K', '>50K')
+census_income$income <- ifelse(census_income$income == '<=50K', 0, 1)
 ```
 
 ## 2 Basic visualisation
 
-To decide on which variables we will focus on in our analysis, we will run some basic statistical tests on the numerical and categorical variables to understand them better.
+To understand our chosen variables better, we ran the summary() function to obtain each of their descriptive statistics. On average, individuals aged 38.44 years worked 40.95 hours per week. These variables had standard deviations of 11.99 years and 13.12 hours respectively.
 
 ```{r}
 # Percentage of respondents with income > 50K
@@ -64,12 +67,14 @@ grid.arrange(age_hist, hours_hist)
 ```
 
 ```{r}
-# Correlation matrix of all numeric variables against income
-library(corrplot)
-CI_numeric <- census_income[, c("age", "hours.per.week", "income")]
-corr_mat <- cor(CI_numeric)
+# correlation matrix
+ci_numeric <- census_income[, c("age", "hours.per.week", "income")]
+corr_mat <- cor(ci_numeric)
 corrplot(corr_mat, method = "number")
 ```
+
+We also attempted to derive the means and standard deviations of ‘hours.per.week’ within the levels of sex, race, and income using the group_by() and summarise() functions. On average, females worked 5.902 fewer hours per week than males. The difference in hours.per.week was less apparent for race, with the greatest difference being white individuals working 2.428 more hours than black individuals. This difference is most apparent when comparing the group with income above US$50,000 and those below US$50,000. Those with higher incomes worked 6.334 hours more. Lastly, we gathered that, on average, the group with income above US$50,000 were aged 43.966 years compared to 36.612 years for those with income below US$50,000.
+
 ```{r}
 # mean and sd of hours worked per week within the levels of sex
 census_income %>%
@@ -101,7 +106,6 @@ summary(census_income$hours.per.week)
 summary(census_income$age)
 sd(census_income$hours.per.week)
 sd(census_income$age)
-
 
 census_income %>%
   group_by(sex) %>%
@@ -157,15 +161,14 @@ summary(linear_hours)
 
 ```{r}
 # linear probability model
-
 lpm <- lm(income ~ age + sex * race, census_income)
 summary(lpm)
-
 ```
 
 ## 5 Graphical representations
 
 ```{r}
+# residual plots
 par(mfrow = c(2, 2))
 plot(lpm)
 ```
@@ -175,5 +178,4 @@ ggplot(census_income, aes(x = age, y = income, color = race)) +
   geom_point(position = "jitter", size = 0.75) + 
   scale_color_manual(values = c("Blue", "Red", "Purple", "Yellow", "Orange")) +
   facet_grid(cols = vars(sex))
-
 ```
