@@ -70,7 +70,7 @@ corrplot(corr_mat, method = "number")
 
 ```{r}
 
-ggplot(melb_housing, aes(x = Type, y = Price)) +
+ggplot(melb_housing, aes(x = Type, y = Price)) + 
   geom_boxplot() +
   scale_x_discrete(guide = guide_axis(check.overlap = TRUE))
 
