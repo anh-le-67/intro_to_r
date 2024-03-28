@@ -9,9 +9,13 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE, comment = "", warning = FALSE)
 ```
 
-According to the Bureau of Labour Statistics, the median annual income in the USA was US$35,492 in 1996. Under the race category, Asian-Pacific Islanders had the highest median of US$43,276, followed by Whites with US$37,161 and Blacks with US$23,482. The wage gap also persisted between genders, with males earning US$8,434 more in median income than females (cite). In 1996, the top 40% and top 20% of households received an aggregate income of US$44,006 and US$68,015 respectively. Thus, the benchmark value of US$50,000 in our dataset can also be an indicator of whether an individual is in the top 30% of households or not. Through this report, we can derive insights into the socioeconomic disparities that existed during that time and accurately identify demographic groups that are disproportionately affected by low income. This allows policymakers and institutions to work towards reducing income inequality and to facilitate their understanding of income determinants. 
+```{asis}
+According to the Bureau of Labour Statistics, the median annual income in the USA was US$35,492 in 1996. Under the race category, Asian-Pacific Islanders had the highest median of US$43,276, followed by Whites with US$37,161 and Blacks with US$23,482. The wage gap also persisted between genders, with males earning US$8,434 more in median income than females (cite). In 1996, the top 40% and top 20% of households received an aggregate income of US$44,006 and US$68,015 respectively. Thus, the benchmark value of US$50,000 in our dataset can also be an indicator of whether an individual is in the top 30% of households or not. Through this report, we can derive insights into the socioeconomic disparities that existed during that time and accurately identify demographic groups that are disproportionately affected by low income. This allows policymakers and institutions to work towards reducing income inequality and to facilitate their understanding of income determinants.
+```
 
+```{asis}
 We will first begin by cleaning the data to ensure only relevant variables are kept and that all data is tidy. Based on the variables in our dataset, we will then run a multiple regression analysis on a mix of numerical and categorical variables to determine whether an individual’s annual income is above or below US$50,000. We expect our findings to conform with the report published by the US government and will also be utilising data visualisation techniques to demonstrate our results.
+```
 
 ## 1 Cleaning
 
@@ -40,9 +44,7 @@ census_income <- subset(census_income, select = -c(native.country, capital.gain,
 census_income <- census_income[complete.cases(census_income$occupation), ]
 
 # Modify the income column to make it 1 if income is above 50k and 0 otherwise
-census_income$income <- ifelse(census_income$income == '<=50K', '<=50K', '>50K')
-
-census_income$income <- ifelse(census_income$income == '<=50K', '0', 1)
+census_income$income <- ifelse(census_income$income == '<=50K', 0, 1)
 ```
 
 ## 2 Basic visualisation
