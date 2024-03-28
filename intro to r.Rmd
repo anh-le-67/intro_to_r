@@ -163,13 +163,8 @@ summary(linear_hours)
 
 ```{r}
 # linear probability model
-lpm <- lm(income ~ age + hours.per.week + sex * race, census_income)
+lpm <- lm(income ~ age + hours.per.week + sex + race, census_income)
 summary(lpm)
-
-# comparison between 'with interaction' and 'without interaction'
-lm0 <- lm(income ~ age + hours.per.week + sex + race, census_income)
-summary(lm0)
-anova(lm0, lpm)
 
 ```
 
