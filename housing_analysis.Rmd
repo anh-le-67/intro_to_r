@@ -2,11 +2,15 @@
 title: "housing_analysis"
 author: "jodi"
 date: "2024-03-28"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    number_sections: true
+    toc_depth: 2
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 ```
 
 ```{r}
@@ -19,23 +23,54 @@ library(corrplot)
 melb_housing <- read.csv("Melbourne_housing_FULL.csv")
 ```
 
-## R Markdown
+## Cleaning
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r}
-lm_house <- lm(income ~ age + hours.per.week + sex + race, census_income)
+# remove missing values from columns
+melb_housing <- melb_housing[complete.cases(melb_housing$Price), ]
+melb_housing <- melb_housing[complete.cases(melb_housing$YearBuilt), ]
+melb_housing <- melb_housing[complete.cases(melb_housing$BuildingArea), ]
+
+# drop columns of houses with Landsize = 0 
+melb_housing <- subset(melb_housing, Landsize != 0)
+
+# convert Distance to a numeric variable
+melb_housing$Distance <- as.numeric(melb_housing$Distance)
+
+# correlation plot 
+mh_numeric <- melb_housing[, c("Price", "Rooms", "Distance", "Bedroom2", "Bathroom", "BuildingArea", "YearBuilt", "Landsize")]
+corr_mat <- cor(mh_numeric)
+corrplot(corr_mat, method = "number")
+```
+
+## Descriptive statistics
+
+```{r}
+ggplot(melb_housing, aes(x = Type, y = Price)) +
+  geom_boxplot() +
+  scale_x_discrete(guide = guide_axis(check.overlap = TRUE))
+
+ggplot(melb_housing, aes(x = YearBuilt, y = Price)) +
+  scale_y_continuous(labels = scales::comma) +
+  geom_point(alpha = 0.1) +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+## Linear regression
+
+```{r}
+lm_house <- lm(Price ~ Distance + Rooms + Type, melb_housing)
 summary(lm_house)
 ```
 
-## Including Plots
+## Data Visualisation
 
 You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+par(mfrow = c(2, 2))
+plot(lm_house)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
