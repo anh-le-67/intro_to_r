@@ -1,7 +1,6 @@
 ---
-title: "housing_analysis"
-author: "jodi"
-date: "2024-03-28"
+title: "Introduction to R: Group Assignment"
+author: "Jodi Tay Seow Xuan (8989982), Le Nguyen Ngoc Anh (2792915), Nil Avci (0889571)"
 output: 
   html_document:
     toc: true
@@ -23,9 +22,9 @@ library(corrplot)
 melb_housing <- read.csv("Melbourne_housing_FULL.csv")
 ```
 
-## Cleaning
+# Introduction
 
-
+# Cleaning
 
 ```{r include=FALSE}
 # remove missing values from columns
@@ -45,7 +44,7 @@ corr_mat <- cor(mh_numeric)
 corrplot(corr_mat, method = "number")
 ```
 
-## Descriptive statistics
+# Descriptive statistics
 
 ```{r}
 
@@ -69,19 +68,32 @@ corrplot(corr_mat, method = "number")
 ## Descriptive statistics
 
 ```{r}
-
 ggplot(melb_housing, aes(x = Type, y = Price)) + 
+  scale_y_continuous(labels = scales::comma) +
   geom_boxplot() +
-  scale_x_discrete(guide = guide_axis(check.overlap = TRUE))
+  coord_flip()
 
-ggplot(melb_housing, aes(x = YearBuilt, y = Price)) +
+melb_housing %>%
+  group_by(Type) %>%
+  summarise(mean(Price), sd(Price), median(Price))
+```
+
+```{r}
+rooms_price <- ggplot(melb_housing, aes(x = Rooms, y = Price)) +
   scale_y_continuous(labels = scales::comma) +
   geom_point(alpha = 0.1) +
   geom_smooth(method = "lm", se = FALSE)
 
+dist_price <- ggplot(melb_housing, aes(x = Distance, y = Price)) +
+  scale_y_continuous(labels = scales::comma) +
+  geom_point(alpha = 0.1) +
+  geom_smooth(method = "lm", se = FALSE)
+
+grid.arrange(rooms_price, dist_price)
 ```
 
-## Linear regression
+# Linear regression
+
 ```{r}
 #Multiple linear regression
 lm_house <- lm(Price ~ Distance + Rooms + Type, melb_housing)
@@ -98,7 +110,8 @@ plot(lm_house)
 summary(lm_house) 
 ```
 
-## Data Visualisation
+# Data visualisation
+
 ```{r echo=FALSE}
 grid.arrange(
   ggplot(melb_housing, aes(Distance, Price, color = Type)) +
