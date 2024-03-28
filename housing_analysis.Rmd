@@ -110,22 +110,3 @@ grid.arrange(
   nrow = 1
 )
 ```
-```
-
-## Linear regression
-
-```{r}
-lm_house <- lm(Price ~ Distance + YearBuilt + Type, melb_housing)
-summary(lm_house)
-```
-
-## Data Visualisation
-
-You can also embed plots, for example:
-
-```{r}
-par(mfrow = c(2, 2))
-plot(lm_house)
-```
-
-
