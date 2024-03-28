@@ -35,8 +35,16 @@ melb_housing <- melb_housing[complete.cases(melb_housing$Price), ]
 melb_housing <- melb_housing[complete.cases(melb_housing$YearBuilt), ]
 melb_housing <- melb_housing[complete.cases(melb_housing$BuildingArea), ]
 
+# drop columns of houses with Landsize = 0 
+melb_housing <- subset(melb_housing, Landsize != 0)
+
 # convert Distance to a numeric variable
 melb_housing$Distance <- as.numeric(melb_housing$Distance)
+
+# correlation plot 
+mh_numeric <- melb_housing[, c("Price", "Rooms", "Distance", "Bedroom2", "Bathroom", "BuildingArea", "YearBuilt", "Landsize")]
+corr_mat <- cor(mh_numeric)
+corrplot(corr_mat, method = "number")
 ```
 
 ## Descriptive statistics
@@ -65,6 +73,6 @@ You can also embed plots, for example:
 
 ```{r}
 par(mfrow = c(2, 2))
-plot(lm)
+plot(lm_house)
 ```
 
