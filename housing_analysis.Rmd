@@ -59,10 +59,9 @@ ggplot(melb_housing, aes(x = YearBuilt, y = Price)) +
 ```
 
 ## Linear regression
-
 ```{r}
+#Multiple linear regression
 lm_house <- lm(Price ~ Distance + Rooms + Type, melb_housing)
-summary(lm_house)
 ```
 
 ```{r}
@@ -71,7 +70,20 @@ par(mfrow = c(2, 2))
 plot(lm_house)
 ```
 
-## Data Visualisation
 ```{r}
-ggplot(melb_housing, aes())
+#Summary of the regression
+summary(lm_house) 
+```
+
+## Data Visualisation
+```{r echo=FALSE}
+grid.arrange(
+  ggplot(melb_housing, aes(Distance, Price, color = Type)) +
+    geom_point() +
+    geom_smooth(method = lm, se = F),
+  ggplot(melb_housing, aes(Rooms, Price, color = Type)) +
+    geom_point(position = "jitter") +
+    geom_smooth(method = lm, se = F),
+  nrow = 1
+)
 ```
