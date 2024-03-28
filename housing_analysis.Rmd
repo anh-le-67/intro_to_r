@@ -27,7 +27,7 @@ melb_housing <- read.csv("Melbourne_housing_FULL.csv")
 
 
 
-```{r}
+```{r include=FALSE}
 # remove missing values from columns
 melb_housing <- melb_housing[complete.cases(melb_housing$Price), ]
 melb_housing <- melb_housing[complete.cases(melb_housing$YearBuilt), ]
@@ -65,12 +65,13 @@ lm_house <- lm(Price ~ Distance + Rooms + Type, melb_housing)
 summary(lm_house)
 ```
 
-## Data Visualisation
-
-You can also embed plots, for example:
-
 ```{r}
+#Assumptions of multiple linear regression
 par(mfrow = c(2, 2))
 plot(lm_house)
 ```
 
+## Data Visualisation
+```{r}
+ggplot(melb_housing, aes())
+```
