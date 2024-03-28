@@ -47,56 +47,45 @@ corrplot(corr_mat, method = "number")
 # Descriptive statistics
 
 ```{r}
+# housing price distribution
+ggplot(melb_housing, aes(Price))+
+  geom_histogram(binwidth = 300000, color = "white", fill = "maroon") +
+  scale_x_continuous(breaks = c(1000000,2000000,3000000,4000000),
+                     labels = c("$1m", "$2m", "$3m", "$4m"))
+```
 
-# remove missing values from columns
-melb_housing <- melb_housing[complete.cases(melb_housing$Price), ]
-melb_housing <- melb_housing[complete.cases(melb_housing$YearBuilt), ]
-melb_housing <- melb_housing[complete.cases(melb_housing$BuildingArea), ]
-
-# drop columns of houses with Landsize = 0 
-melb_housing <- subset(melb_housing, Landsize != 0)
-
-# convert Distance to a numeric variable
-melb_housing$Distance <- as.numeric(melb_housing$Distance)
-
+```{r}
 # correlation plot 
 mh_numeric <- melb_housing[, c("Price", "Rooms", "Distance", "Bedroom2", "Bathroom", "BuildingArea", "YearBuilt", "Landsize")]
 corr_mat <- cor(mh_numeric)
 corrplot(corr_mat, method = "number")
 ```
 
-## Descriptive statistics
-
 ```{r}
+# box plot of price and house type
 ggplot(melb_housing, aes(x = Type, y = Price)) + 
   scale_y_continuous(labels = scales::comma) +
   geom_boxplot() +
   coord_flip()
+```
 
+```{r}
 melb_housing %>%
   group_by(Type) %>%
   summarise(mean(Price), sd(Price), median(Price))
 ```
 
 ```{r}
-rooms_price <- ggplot(melb_housing, aes(x = Rooms, y = Price)) +
-  scale_y_continuous(labels = scales::comma) +
-  geom_point(alpha = 0.1) +
-  geom_smooth(method = "lm", se = FALSE)
-
-dist_price <- ggplot(melb_housing, aes(x = Distance, y = Price)) +
-  scale_y_continuous(labels = scales::comma) +
-  geom_point(alpha = 0.1) +
-  geom_smooth(method = "lm", se = FALSE)
-
-grid.arrange(rooms_price, dist_price)
+# descriptive statistics of price, rooms, and distance
+melb_housing %>%
+  summarise(mean(Price), median(Price), mean(Rooms), median(Rooms), mean(Distance), median(Distance))
 ```
 
 # Linear regression
 
 ```{r}
 #Multiple linear regression
-lm_house <- lm(Price ~ Distance + Rooms + Type, melb_housing)
+lm_house <- lm(log(Price) ~ Distance + Rooms + Type, melb_housing)
 ```
 
 ```{r}
