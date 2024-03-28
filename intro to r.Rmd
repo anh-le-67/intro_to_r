@@ -2,7 +2,7 @@
 title: "intro to r project"
 author: "jodi"
 date: "2024-02-22"
-output: html_document
+output: pdf
 ---
 
 ```{r setup, include=FALSE}
@@ -17,7 +17,7 @@ We will first begin by cleaning the data to ensure only relevant variables are k
 
 The adult census income data was sourced from Kaggle, a platform with a repository of community-published models, data, and code (Kaggle, n.d.). Specifically, it was jointly published by UCI Machine Learning and the Kaggle Team.
 
-The data cleaning process involved several steps. First, we replaced the ‘?’ elements with NA using lapply() to properly deal with those missing values. We then used complete.cases() to remove the missing values to ensure that they do not skew our regression results. We also modified the income variable to a dummy variable, where it displayed 1 if income is above US$50,000 and 0 otherwise. This step allowed us to include a categorical variable in our future regression analysis.  
+The data cleaning process involved several steps. First, we replaced the `?` elements with NA using `lapply()` to properly deal with those missing values. We then used `complete.cases()` to remove the missing values to ensure that they do not skew our regression results. We also modified the income variable to a dummy variable, where it displayed 1 if income is above US$50,000 and 0 otherwise. This step allowed us to include a categorical variable in our future regression analysis.  
 
 ```{r, message=FALSE}
 library(dplyr)
@@ -47,7 +47,7 @@ census_income$income <- ifelse(census_income$income == '<=50K', '0', 1)
 
 ## 2 Basic visualisation
 
-To understand our chosen variables better, we ran the summary() function to obtain each of their descriptive statistics. On average, individuals aged 38.44 years worked 40.95 hours per week. These variables had standard deviations of 11.99 years and 13.12 hours respectively.
+To understand our chosen variables better, we ran the `summary()` function to obtain each of their descriptive statistics. On average, individuals aged 38.44 years worked 40.95 hours per week. These variables had standard deviations of 11.99 years and 13.12 hours respectively.
 
 ```{r}
 # Percentage of respondents with income > 50K
@@ -163,13 +163,8 @@ summary(linear_hours)
 
 ```{r}
 # linear probability model
-lpm <- lm(income ~ age + hours.per.week + sex * race, census_income)
+lpm <- lm(income ~ age + hours.per.week + sex + race, census_income)
 summary(lpm)
-
-# comparison between 'with interaction' and 'without interaction'
-lm0 <- lm(income ~ age + hours.per.week + sex + race, census_income)
-summary(lm0)
-anova(lm0, lpm)
 
 ```
 
